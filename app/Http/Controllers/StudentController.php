@@ -1,77 +1,73 @@
 <?php
 
-
 namespace App\Http\Controllers;
-
 
 use App\Models\Student;
 use Illuminate\Http\Request;
-
+use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
-   /**
-    * Display a listing of the resource.
-    */
-   public function index()
+    public function index()
+    {
+        return view('student.list', [
+            'students' => Student::all(),
+        ]);
+    }
 
-   {
-    //Get every row from the students table
-       $students=student::all();
-       return view("student.index"),["students" => $students];
-   }
+    public function create()
+    {
+        return view('student.create');
+    }
 
+    public function store(Request $request)
+    {
+        $student = Student::create($request->validate($this->rules()));
 
-   /**
-    * Show the form for creating a new resource.
-    */
-   public function create()
-   {
-       return view("student.create");
-   }
+        return redirect()
+            ->route('students.index')
+            ->with('success', "Student {$student->name} created successfully!");
+    }
 
+    public function show(Student $student)
+    {
+        return view('student.detail', ['student' => $student]);
+    }
 
-   /**
-    * Store a newly created resource in storage.
-    */
-   public function store(Request $request)
-   {
-       //
-   }
+    public function edit(Student $student)
+    {
+        return view('student.edit', ['student' => $student]);
+    }
 
+    public function update(Request $request, Student $student)
+    {
+        $student->update($request->validate($this->rules($student)));
 
-   /**
-    * Display the specified resource.
-    */
-   public function show(Student $student)
-   {
-       return view("student.show");
-   }
+        return redirect()
+            ->route('students.show', $student)
+            ->with('success', 'Student updated successfully!');
+    }
 
+    public function destroy(Student $student)
+    {
+        $student->delete();
 
-   /**
-    * Show the form for editing the specified resource.
-    */
-   public function edit(Student $student)
-   {
-       return view("student.edit");
-   }
+        return redirect()
+            ->route('students.index')
+            ->with('success', 'Student deleted successfully!');
+    }
 
-
-   /**
-    * Update the specified resource in storage.
-    */
-   public function update(Request $request, Student $student)
-   {
-       //
-   }
-
-
-   /**
-    * Remove the specified resource from storage.
-    */
-   public function destroy(Student $student)
-   {
-       //
-   }
+    private function rules(?Student $student = null): array
+    {
+        return [
+            'name'  => 'required|string|max:255',
+            'email' => [
+                'required', 'email', 'max:255',
+                Rule::unique('students')->ignore($student?->id),
+            ],
+            'phone'         => 'required|string|max:20',
+            'address'       => 'nullable|string|max:500',
+            'date_of_birth' => 'nullable|date',
+        ];
+    }
 }
