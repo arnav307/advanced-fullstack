@@ -18,9 +18,8 @@ class Course extends Model
     protected function casts(): array
     {
         return [
-            'duration' => 'integer',
-            'fee' => 'decimal:2',
             'is_active' => 'boolean',
+            'fee'       => 'decimal:2',
         ];
     }
 }
