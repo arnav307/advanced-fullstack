@@ -26,4 +26,10 @@ class Student extends Model
     {
         return Attribute::get(fn () => $this->date_of_birth?->age);
     }
+    protected $casts = ['date_of_birth' => 'date'];
+
+    public function getAgeAttribute(): ?int
+    {
+        return $this->date_of_birth?->age;
+    }
 }
